@@ -26,6 +26,12 @@ public slots:
      * @param timeout   - clear icon after timeout ms
      */
     void SetIcon(const QIcon& icon, int timeout);
+
+    /**
+     * @brief SetPrecent set progress bar percent
+     * @param val       - 100 percentage
+     */
+    void SetPrecent(int val);
 public:
     explicit NStatusBar(QWidget* parent = Q_NULLPTR);
 

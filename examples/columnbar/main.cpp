@@ -19,6 +19,9 @@ int main(int argc, char** argv)
             });
 
     QObject::connect(colbar, SIGNAL(clicked(int)), responser, SLOT(onColBarClicked(int)));
+
+    colbar->resize(120, 680);
+    colbar->setWindowTitle("Column Bar Example");
     colbar->show();
     return app.exec();
 }

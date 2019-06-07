@@ -23,11 +23,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         src/widgets/columnbar/ncolbar.cpp \
-        src/widgets/statusbar/nstatusbar.cpp
+        src/widgets/statusbar/nstatusbar.cpp \
+        src/widgets/tableview/ntableview.cpp
 
 HEADERS += \
         include/widgets/ncolbar.h \
-        include/widgets/nstatusbar.h
+        include/widgets/nstatusbar.h \
+        include/widgets/ntableview.h
 
 INCLUDEPATH += \
         include
@@ -36,3 +38,5 @@ unix {
     target.path = ../build
     INSTALLS += target
 }
+
+DESTDIR = ../build
