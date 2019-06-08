@@ -1,10 +1,12 @@
 QT += widgets
 TARGET       = tableview
 TEMPLATE     = app
-SOURCES     += main.cpp
+SOURCES     += main.cpp \
+               ../../fire/src/widgets/tableview/ntableview.cpp
+
+HEADERS     += ../../fire/include/widgets/ntableview.h
 
 INCLUDEPATH += ../../fire/include
-LIBS        += -L${OBJECTS_DIR}/../../../build -lfire
 
 RESOURCES += grades.qrc
 

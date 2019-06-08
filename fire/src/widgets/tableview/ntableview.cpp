@@ -7,16 +7,13 @@
 
 //! [constructor]
 NTableView::NTableView(QAbstractItemModel * model)
+    : currentSection_(0)
 {
+
     horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onHHeaderCtxMenuRequested(QPoint)));
 
-
-    model->insertColumn(0);
-    model->setHeaderData(0, Qt::Horizontal, QString("occupy"));
-
     setModel(model);
-    setColumnHidden(0, true);
     frozenTableView = new QTableView(this);
 
 
@@ -44,7 +41,6 @@ NTableView::~NTableView()
 
 void NTableView::freezeSection(int logicalIndex)
 {
-    setColumnHidden(0, false);
     frozenTableView->show();
     for (int column = 0; column < model()->columnCount(); ++column)
     {
@@ -62,41 +58,35 @@ void NTableView::freezeSection(int logicalIndex)
 
 void NTableView::cancelFreeze()
 {
-    setColumnHidden(0, true);
     frozenTableView->setHidden(true);
 }
 
 void NTableView::onHHeaderCtxMenuRequested(QPoint pos)
 {
-    int currentSection = horizontalHeader()->logicalIndexAt(pos);
+    currentSection_ = horizontalHeader()->logicalIndexAt(pos);
     QPoint globalPos = horizontalHeader()->mapToGlobal(pos);
     QMenu* menu = new QMenu(this);
 
     QAction* freezeSection = menu->addAction("Freeze Section");
-    connect(freezeSection, &QAction::triggered, this, [currentSection,this]{this->freezeSection(currentSection);});
+    connect(freezeSection, &QAction::triggered, this, [this]{
+        this->freezeSection(currentSection_);
+        frozenTableView->setColumnWidth(currentSection_, columnWidth(0));
+        updateFrozenTableGeometry();
+    });
 
     QAction* cancelFreeze  = menu->addAction("Cancel Freeze");
     connect(cancelFreeze, &QAction::triggered, this, [this]{this->cancelFreeze();});
 
+    menu->addSeparator();
+
     QAction* hideSection   = menu->addAction("Hide Section");
-    connect(hideSection, &QAction::triggered, this, [currentSection,this]{setColumnHidden(currentSection, true); });
+    connect(hideSection, &QAction::triggered, this, [this]{setColumnHidden(currentSection_, true); });
 
     QAction* showSection   = menu->addAction("Show Sections");
     connect(showSection, &QAction::triggered, this, [this]{
         for (int column = 0; column < model()->columnCount(); ++column)
         {
-            if (column == 0 && frozenTableView->isVisible())
-            {
-                setColumnHidden(column, false);
-            }
-            else if (column == 0 && frozenTableView->isHidden())
-            {
-                setColumnHidden(column, true);
-            }
-            else
-            {
-                setColumnHidden(column, false);
-            }
+            setColumnHidden(column, false);
         }
     });
 
@@ -121,7 +111,6 @@ void NTableView::init()
                                    "background-color: #EEE;"
                                    "selection-background-color: #999}"); //for demo purposes
     frozenTableView->setSelectionModel(selectionModel());
-    frozenTableView->setColumnWidth(0, columnWidth(0) );
 
     frozenTableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     frozenTableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -140,10 +129,8 @@ void NTableView::init()
 //! [sections]
 void NTableView::updateSectionWidth(int logicalIndex, int /* oldSize */, int newSize)
 {
-    if (logicalIndex == 0){
-        frozenTableView->setColumnWidth(0, newSize);
-        updateFrozenTableGeometry();
-    }
+    frozenTableView->setColumnWidth(currentSection_, columnWidth(0));
+    updateFrozenTableGeometry();
 }
 
 void NTableView::updateSectionHeight(int logicalIndex, int /* oldSize */, int newSize)

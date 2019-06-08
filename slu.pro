@@ -10,4 +10,3 @@ SUBDIRS = fire \
 # app.depends = lib # may exclude dependcies
 columnbar.depends = fire
 statusbar.depends = fire
-tableview.depends = fire

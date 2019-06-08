@@ -25,6 +25,7 @@ private:
       void updateFrozenTableGeometry();
       //
       QTableView *frozenTableView;
+      int         currentSection_;
 
 private slots:
       void updateSectionWidth(int logicalIndex, int oldSize, int newSize);
