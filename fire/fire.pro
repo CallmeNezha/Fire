@@ -24,12 +24,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         src/widgets/columnbar/ncolbar.cpp \
         src/widgets/statusbar/nstatusbar.cpp \
-        src/widgets/tableview/ntableview.cpp
+        src/widgets/tableview/ntableview.cpp \
+        src/widgets/tableview/nfindbar.cpp
 
 HEADERS += \
         include/widgets/ncolbar.h \
         include/widgets/nstatusbar.h \
-        include/widgets/ntableview.h
+        include/widgets/ntableview.h \
+        include/widgets/nfindbar.h
 
 INCLUDEPATH += \
         include
