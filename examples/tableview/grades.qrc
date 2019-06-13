@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>grades.txt</file>
-        <file>msg_name_table.csv</file>
     </qresource>
 </RCC>

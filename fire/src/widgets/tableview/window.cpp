@@ -11,7 +11,7 @@
 QStandardItemModel* parseCSV(QStringList &header_list)
 {
     QStandardItemModel* csvModel = new QStandardItemModel();
-    QFile file(":/msg_name_table.csv");
+    QFile file("D:/Huang/msg_name_table.csv");
 
     if ( !file.open(QFile::ReadOnly | QFile::Text) ) {
         qDebug() << "File not exists";
@@ -99,7 +99,6 @@ void Window::filter()
     QRegExpValidator v2(rx2);
     int pos = 0;
     QString text = nfilterBar->get_filter_editor_text();
-//    qDebug() <<v2.validate(text, pos);
     // If a valid text which can pass the regexp validator is inputted, set the switcher TRUE and start complex filter mode
     //     else go to global filter
     if(v2.validate(text, pos) == 2 && (nfilterBar->patternSyntax() == 2 || nfilterBar->patternSyntax() == 3))
