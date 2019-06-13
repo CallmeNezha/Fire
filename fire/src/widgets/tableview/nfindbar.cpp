@@ -38,8 +38,6 @@ NFindBar::NFindBar(QWidget *parent)
     close_button.setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
     connect(&close_button, &QPushButton::clicked, this, &QWidget::hide);
 
-
-
     QMenu *menu = new QMenu(this);
     case_sensitivity_action_ = menu->addAction(tr("Case Sensitive"));
     case_sensitivity_action_->setCheckable(true);
@@ -71,6 +69,18 @@ NFindBar::NFindBar(QWidget *parent)
     QWidgetAction *optionsAction = new QWidgetAction(&find_editor);
     optionsAction->setDefaultWidget(optionsButton);
     find_editor.addAction(optionsAction, QLineEdit::LeadingPosition);
+}
+
+void NFindBar::show_hide()
+{
+    if(isHidden())
+    {
+        show();
+    }
+    else
+    {
+        hide();
+    }
 }
 
 Qt::CaseSensitivity NFindBar::caseSensitivity() const

@@ -9,9 +9,6 @@
 #include <QActionGroup>
 #include <QRegExp>
 
-
-//Q_DECLARE_METATYPE(QRegExp::PatternSyntax)
-
 class NFilterBar : public QWidget
 {
     Q_OBJECT
@@ -21,6 +18,9 @@ class NFilterBar : public QWidget
 signals:
     void filterBtnClicked();
     void filterChanged();
+
+public slots:
+    void show_hide();
 
 public:
     enum SearchSpec

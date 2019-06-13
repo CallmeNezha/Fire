@@ -68,6 +68,10 @@ NFilterBar::NFilterBar(QWidget *parent)
 // append formatted column name to the search text
 void NFilterBar::append_column_name_to_filter_text(QString head)
 {
+    if(isHidden())
+    {
+        show();
+    }
     QString current_text = filter_editor.text();
     if (current_text.trimmed().isEmpty())
     {
@@ -80,6 +84,19 @@ void NFilterBar::append_column_name_to_filter_text(QString head)
         current_text.append(" | \"" + head + "\" = {\"\"}");
     }
     filter_editor.setText(current_text);
+}
+
+//
+void NFilterBar::show_hide()
+{
+    if(isHidden())
+    {
+        show();
+    }
+    else
+    {
+        hide();
+    }
 }
 
 QLineEdit const & NFilterBar::get_filter_editor()

@@ -28,7 +28,7 @@ QStandardItemModel* parseCSV(QStringList &header_list)
             QString line = in.readLine();
             // Adding to the model in line with the elements
             QList<QStandardItem *> standardItemsList;
-            // consider that the line separated by semicolons into columns
+            // Consider that the line separated by semicolons into columns
             for (QString item : line.split(",")) {
                 standardItemsList.append(new QStandardItem(item));
             }
@@ -71,15 +71,16 @@ Window::Window()
     QObject::connect(ntableView, SIGNAL(get_head(int)), this, SLOT(rec_head(int)));
 
     QObject::connect(&nfilterBar->get_filter_editor(), SIGNAL(returnPressed()), nfilterBar, SIGNAL(filterBtnClicked()), Qt::UniqueConnection);
+
     // Bind action with slots and connect
     QAction* find_action = new QAction("Find", ntableView);
     find_action->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-    QObject::connect(find_action, SIGNAL(triggered()), nfindBar, SLOT(show()));
+    QObject::connect(find_action, SIGNAL(triggered()), nfindBar, SLOT(show_hide()));
     ntableView->addAction(find_action);
 
     QAction* filter_action = new QAction("Filter", ntableView);
     filter_action->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
-    QObject::connect(filter_action, SIGNAL(triggered()), nfilterBar, SLOT(show()));
+    QObject::connect(filter_action, SIGNAL(triggered()), nfilterBar, SLOT(show_hide()));
     ntableView->addAction(filter_action);
 
     // Show main window
@@ -100,70 +101,36 @@ void Window::filter()
     int pos = 0;
     QString text = nfilterBar->get_filter_editor_text();
     // If a valid text which can pass the regexp validator is inputted, set the switcher TRUE and start complex filter mode
-    //     else go to global filter
-    if(v2.validate(text, pos) == 2 && (nfilterBar->patternSyntax() == 2 || nfilterBar->patternSyntax() == 3))
+        // else go to global filter
+    if(v2.validate(text, pos) == 2)
     {
         nsortfilterproxyModel->set_switcher(TRUE);
         nsortfilterproxyModel->clear();
         QStringList list = nfilterBar->get_filter_editor_text().split("|");
         for(QString per_string:list)
         {
-            if(!v2.validate(per_string, pos))
+            // "head" : column name
+            QString head = per_string.split("=")[0].split("\"")[1];
+            // "value" : store different regexp for the same "head"
+            QVector<QRegExp> value;
+            QString temp;
+            for(QString temp:per_string.split("=")[1].split(","))
+            {
+                value.append(QRegExp(temp.split("\"")[1], nfilterBar->caseSensitivity(), nfilterBar->patternSyntax()));
+            }
+
+            int key = header_list.indexOf(head);
+            // By default, when parameter "key" == -1, which means the column to be searched is -1, then the column limit will be invalid.
+            if(key != -1)
+            {
+                nsortfilterproxyModel->append(key, value);
+                nsortfilterproxyModel->setFilterRegExp(QRegExp());
+            }
+            // Can't find specific head in header_list
+            else
             {
                 global_filter();
                 break;
-            }
-            else
-            {
-                // When parsing the text, it's necessary to checked if format is valid again to avoid index out of range
-                if(per_string.split("=")[0].split("\"").size() == 3)
-                {
-                    QString head = per_string.split("=")[0].split("\"")[1];
-                    QVector<QRegExp> value;
-                    QString temp;
-                    for(QString temp:per_string.split("=")[1].split(","))
-                    {
-                        // If format is valid, append regexp
-                        if(temp.split("\"").size() == 3)
-                        {
-                            value.append(QRegExp(temp.split("\"")[1], nfilterBar->caseSensitivity(), nfilterBar->patternSyntax()));
-                        }
-                        else
-                        {
-                            nsortfilterproxyModel->set_switcher(FALSE);
-                            break;
-                        }
-                    }
-                    // If format is valid, start filtering
-                    if(nsortfilterproxyModel->get_switcher())
-                    {
-                        int key = header_list.indexOf(head);
-                        // By default, when parameter "key" == -1, which means the column to be searched is -1, then the column limit will be invalid.
-                        if(key != -1)
-                        {
-                            nsortfilterproxyModel->append(key, value);
-                            nsortfilterproxyModel->setFilterRegExp(QRegExp());
-                        }
-                        // Can't find specific head in header_list
-                        else
-                        {
-                            global_filter();
-                            break;
-                        }
-                    }
-                    // format error
-                    else
-                    {
-                        global_filter();
-                        break;
-                    }
-                }
-                // format error
-                else
-                {
-                    global_filter();
-                    break;
-                }
             }
         }
     }
@@ -172,13 +139,6 @@ void Window::filter()
     {
         global_filter();
     }
-
-//    match
-//    QModelIndexList nidx = nsortfilterproxyModel->match(
-//                nsortfilterproxyModel->index(0,2)
-//                , Qt::DisplayRole
-//                , "5", -1, Qt::MatchContains);
-
 }
 
 // Filter key words globally

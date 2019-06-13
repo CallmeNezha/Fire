@@ -22,6 +22,9 @@ signals:
     void nextBtnClicked();
     void filterChanged();
 
+public slots:
+    void show_hide();
+
 public:
     enum SearchSpec
     {

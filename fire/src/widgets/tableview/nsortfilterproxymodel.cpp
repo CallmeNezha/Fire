@@ -1,6 +1,5 @@
 #include "widgets/nsortfilterproxymodel.h"
 
-//! [0]
 NSortFilterProxyModel::NSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
@@ -29,10 +28,7 @@ bool NSortFilterProxyModel::get_switcher()
 {
     return switcher;
 }
-//! [0]
 
-//! [1]
-//!
 bool NSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
@@ -69,32 +65,5 @@ bool NSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         return ret;
     }
 }
-//! [1]
 
-//! [2] //! [3]
-//bool NSortFilterProxyModel::lessThan(const QModelIndex &left,
-//                                      const QModelIndex &right) const
-//{
-//    QVariant leftData = sourceModel()->data(left);
-//    QVariant rightData = sourceModel()->data(right);
-////! [2]
-
-////! [4]
-//    if (leftData.type() == QVariant::DateTime) {
-//        return leftData.toDateTime() < rightData.toDateTime();
-//    } else {
-//        static QRegExp emailPattern("[\\w\\.]*@[\\w\\.]*)");
-
-//        QString leftString = leftData.toString();
-//        if(left.column() == 1 && emailPattern.indexIn(leftString) != -1)
-//            leftString = emailPattern.cap(1);
-
-//        QString rightString = rightData.toString();
-//        if(right.column() == 1 && emailPattern.indexIn(rightString) != -1)
-//            rightString = emailPattern.cap(1);
-
-//        return QString::localeAwareCompare(leftString, rightString) < 0;
-//    }
-//}
-//! [3] //! [4]
 

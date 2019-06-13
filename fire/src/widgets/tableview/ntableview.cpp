@@ -3,7 +3,6 @@
 #include <QScrollBar>
 #include <QHeaderView>
 
-
 //! [constructor]
 NTableView::NTableView(QAbstractItemModel * model, QWidget* parent)
     : QTableView (parent)
