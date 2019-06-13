@@ -1,13 +1,13 @@
 #include "widgets/ntableview.h"
-
 #include <QMenu>
 #include <QScrollBar>
 #include <QHeaderView>
 
 
 //! [constructor]
-NTableView::NTableView(QAbstractItemModel * model)
-    : currentSection_(0)
+NTableView::NTableView(QAbstractItemModel * model, QWidget* parent)
+    : QTableView (parent)
+    , currentSection_(0)
 {
 
     horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -89,6 +89,11 @@ void NTableView::onHHeaderCtxMenuRequested(QPoint pos)
             setColumnHidden(column, false);
         }
     });
+
+    menu->addSeparator();
+
+    QAction* filterSection = menu->addAction("Filter Append");
+    connect(filterSection, &QAction::triggered, this, [this]{ emit get_head(currentSection_);});
 
     menu->exec(globalPos);
 }
