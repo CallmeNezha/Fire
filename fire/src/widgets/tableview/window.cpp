@@ -111,12 +111,12 @@ void Window::appendColumnNameToFilter()
 /* Filter function can filter specific rows the user want with fixed string or regexps */
 void Window::filter()
 {
-    QRegExp rx2("\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\(\\|\(\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\)\)*");
-    QRegExpValidator v2(rx2);
+    QRegExp rx("\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\(\\|\(\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\)\)*");
+    QRegExpValidator validator(rx);
     int pos = 0;
     QString text = nfilterBar->text();
     // If a valid text which can pass the regexp validator is inputted, set the switcher TRUE and start complex filter mode, else go to global filter.
-    if(v2.validate(text, pos) == 2)
+    if(validator.validate(text, pos) == 2)
     {
         nsortfilterproxyModel->set_switcher(TRUE);
         nsortfilterproxyModel->clear();
