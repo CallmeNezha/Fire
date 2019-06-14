@@ -19,6 +19,9 @@ signals:
     void filterBtnClicked();
     void filterChanged();
 
+    /// RETURN KEY PRESSED WHEN FOCUS ON THIS WIDGET
+    void returnPressed();
+
 public slots:
     void show_hide();
 
@@ -36,14 +39,11 @@ public:
     Qt::CaseSensitivity caseSensitivity() const;
     void setCaseSensitivity(Qt::CaseSensitivity cs);
 
-
     QRegExp::PatternSyntax patternSyntax() const;
     void setPatternSyntax(QRegExp::PatternSyntax s);
 
-    QString get_filter_editor_text() const { return filter_editor.text();}
-    void append_column_name_to_filter_text(QString head);
-
-    QLineEdit const &get_filter_editor();
+    QString text() const { return filter_editor.text();}
+    void setText(QString text);
 
 private:
 

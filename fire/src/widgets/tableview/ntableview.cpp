@@ -6,7 +6,7 @@
 //! [constructor]
 NTableView::NTableView(QAbstractItemModel * model, QWidget* parent)
     : QTableView (parent)
-    , currentSection_(0)
+    , selectedSection_(0)
 {
 
     horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -37,6 +37,21 @@ NTableView::~NTableView()
     delete frozenTableView;
 }
 
+void NTableView::addCustomAction(QAction *action)
+{
+    userActions_.append(action);
+}
+
+void NTableView::addCustomActions(QList<QAction*> actions)
+{
+    userActions_.append(actions);
+}
+
+bool NTableView::removeCustomAction(QAction *action)
+{
+    return userActions_.removeOne(action);
+}
+
 
 void NTableView::freezeSection(int logicalIndex)
 {
@@ -62,14 +77,14 @@ void NTableView::cancelFreeze()
 
 void NTableView::onHHeaderCtxMenuRequested(QPoint pos)
 {
-    currentSection_ = horizontalHeader()->logicalIndexAt(pos);
+    selectedSection_ = horizontalHeader()->logicalIndexAt(pos);
     QPoint globalPos = horizontalHeader()->mapToGlobal(pos);
     QMenu* menu = new QMenu(this);
 
     QAction* freezeSection = menu->addAction("Freeze Section");
     connect(freezeSection, &QAction::triggered, this, [this]{
-        this->freezeSection(currentSection_);
-        frozenTableView->setColumnWidth(currentSection_, columnWidth(0));
+        this->freezeSection(selectedSection_);
+        frozenTableView->setColumnWidth(selectedSection_, columnWidth(0));
         updateFrozenTableGeometry();
     });
 
@@ -79,7 +94,7 @@ void NTableView::onHHeaderCtxMenuRequested(QPoint pos)
     menu->addSeparator();
 
     QAction* hideSection   = menu->addAction("Hide Section");
-    connect(hideSection, &QAction::triggered, this, [this]{setColumnHidden(currentSection_, true); });
+    connect(hideSection, &QAction::triggered, this, [this]{setColumnHidden(selectedSection_, true); });
 
     QAction* showSection   = menu->addAction("Show Sections");
     connect(showSection, &QAction::triggered, this, [this]{
@@ -89,11 +104,10 @@ void NTableView::onHHeaderCtxMenuRequested(QPoint pos)
         }
     });
 
+
+
     menu->addSeparator();
-
-    QAction* filterSection = menu->addAction("Filter Append");
-    connect(filterSection, &QAction::triggered, this, [this]{ emit get_head(currentSection_);});
-
+    menu->addActions(userActions_);
     menu->exec(globalPos);
 }
 
@@ -133,7 +147,7 @@ void NTableView::init()
 //! [sections]
 void NTableView::updateSectionWidth(int logicalIndex, int /* oldSize */, int newSize)
 {
-    frozenTableView->setColumnWidth(currentSection_, columnWidth(0));
+    frozenTableView->setColumnWidth(selectedSection_, columnWidth(0));
     updateFrozenTableGeometry();
 }
 

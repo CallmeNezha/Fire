@@ -9,10 +9,15 @@ class NTableView : public QTableView {
 
 public:
     NTableView(QAbstractItemModel * model, QWidget* parent=Q_NULLPTR);
-    ~NTableView();
+    ~NTableView() override;
 
-signals:
-    void get_head(int head_index);
+    int selectedSection() const { return selectedSection_; }
+
+    /* User Custom Actions */
+    void     addCustomAction(QAction *action);
+    void     addCustomActions(QList<QAction *> actions);
+    bool     removeCustomAction(QAction* action);
+
 
 public slots:
     void freezeSection(int logicalIndex);
@@ -28,7 +33,9 @@ private:
     void updateFrozenTableGeometry();
     //
     QTableView *frozenTableView;
-    int         currentSection_;
+    int         selectedSection_;
+    QList<QAction*> userActions_;
+
 
 private slots:
     void updateSectionWidth(int logicalIndex, int oldSize, int newSize);

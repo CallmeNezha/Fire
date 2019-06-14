@@ -20,6 +20,12 @@ class NFindBar;
 class NSortFilterProxyModel;
 class NTableView;
 
+class Filter : public QObject
+{
+    Q_OBJECT
+
+};
+
 //! [0]
 class Window : public QWidget
 {
@@ -33,7 +39,9 @@ private slots:
     void filter();
     void prev();
     void next();
-    void rec_head(int head_index);
+
+    //
+    void appendColumnNameToFilter();
 
 private:
     NFindBar *nfindBar;
@@ -48,6 +56,8 @@ private:
     void global_filter();
 };
 //! [0]
+
+
 
 
 #endif // WINDOW_H

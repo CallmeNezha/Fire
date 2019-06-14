@@ -63,27 +63,18 @@ NFilterBar::NFilterBar(QWidget *parent)
     QWidgetAction *optionsAction = new QWidgetAction(&filter_editor);
     optionsAction->setDefaultWidget(optionsButton);
     filter_editor.addAction(optionsAction, QLineEdit::LeadingPosition);
+
+    connect(&filter_editor, &QLineEdit::returnPressed, this, &NFilterBar::returnPressed);
 }
 
 // append formatted column name to the search text
-void NFilterBar::append_column_name_to_filter_text(QString head)
+void NFilterBar::setText(QString text)
 {
     if(isHidden())
     {
         show();
     }
-    QString current_text = filter_editor.text();
-    if (current_text.trimmed().isEmpty())
-    {
-        current_text.clear();
-        current_text.append("\"" + head + "\" = {\"\"}");
-    }
-    else
-    {
-        current_text = current_text.trimmed();
-        current_text.append(" | \"" + head + "\" = {\"\"}");
-    }
-    filter_editor.setText(current_text);
+    filter_editor.setText(text);
 }
 
 //
@@ -99,10 +90,6 @@ void NFilterBar::show_hide()
     }
 }
 
-QLineEdit const & NFilterBar::get_filter_editor()
-{
-    return filter_editor;
-}
 
 Qt::CaseSensitivity NFilterBar::caseSensitivity() const
 {

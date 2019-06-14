@@ -41,19 +41,19 @@ QStandardItemModel* parseCSV(QStringList &header_list)
 
 Window::Window()
 {
-    // Create main window
+    /* Create main window */
     qmainWindow = new QMainWindow();
     qmainWindow->setCentralWidget(new QWidget());
     qmainWindow->resize(860, 640);
 
-    // Load source model, load proxy model with source model.Then set the proxy model as source model in tableview
+    /* Load source model, load proxy model with source model.Then set the proxy model as source model in tableview */
     sourceModel = new QStandardItemModel();
     sourceModel = parseCSV(header_list);
     nsortfilterproxyModel = new NSortFilterProxyModel();
     nsortfilterproxyModel->setSourceModel(sourceModel);
     ntableView = new NTableView(nsortfilterproxyModel);
 
-    // Add widgets and set specific attributes
+    /* Add widgets and set specific attributes */
     qvboxLayout = new QVBoxLayout();
     qmainWindow->centralWidget()->setLayout(qvboxLayout);
     qvboxLayout->addWidget(ntableView);
@@ -64,15 +64,18 @@ Window::Window()
     qvboxLayout->addWidget(nfindBar);
     nfindBar->hide();
 
-    // Add connections
+    /* Add connections */
     QObject::connect(nfilterBar, SIGNAL(filterBtnClicked()), this, SLOT(filter()));
     QObject::connect(nfindBar, SIGNAL(prevBtnClicked()), this, SLOT(prev()));
     QObject::connect(nfindBar, SIGNAL(nextBtnClicked()), this, SLOT(next()));
-    QObject::connect(ntableView, SIGNAL(get_head(int)), this, SLOT(rec_head(int)));
 
-    QObject::connect(&nfilterBar->get_filter_editor(), SIGNAL(returnPressed()), nfilterBar, SIGNAL(filterBtnClicked()), Qt::UniqueConnection);
+    /* Add column name to filter action */
+    QAction* append_column_filter = new QAction("Filter Column");
+    ntableView->addCustomAction(append_column_filter);
+    QObject::connect(append_column_filter, &QAction::triggered, this, &Window::appendColumnNameToFilter);
+    QObject::connect(nfilterBar, SIGNAL(returnPressed()), nfilterBar, SIGNAL(filterBtnClicked()), Qt::UniqueConnection);
 
-    // Bind action with slots and connect
+    /* Bind action with slots and connect */
     QAction* find_action = new QAction("Find", ntableView);
     find_action->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
     QObject::connect(find_action, SIGNAL(triggered()), nfindBar, SLOT(show_hide()));
@@ -83,14 +86,27 @@ Window::Window()
     QObject::connect(filter_action, SIGNAL(triggered()), nfilterBar, SLOT(show_hide()));
     ntableView->addAction(filter_action);
 
-    // Show main window
+    /* Show main window */
     qmainWindow->show();
 }
 
 // Receive head index from ntableview, parse it into the specific column name and append
-void Window::rec_head(int head_index)
+void Window::appendColumnNameToFilter()
 {
-    nfilterBar->append_column_name_to_filter_text(header_list[head_index]);
+    QString current_text = nfilterBar->text();
+
+    const QString head = ntableView->model()->headerData(ntableView->selectedSection(), Qt::Horizontal).toString();
+    if (current_text.trimmed().isEmpty())
+    {
+        current_text.clear();
+        current_text.append("\"" + head + "\" = {\"\"}");
+    }
+    else
+    {
+        current_text = current_text.trimmed();
+        current_text.append(" | \"" + head + "\" = {\"\"}");
+    }
+    nfilterBar->setText(current_text);
 }
 
 // Filter function can filter specific rows the user want with fixed string or regexps
@@ -99,14 +115,14 @@ void Window::filter()
     QRegExp rx2("\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\(\\|\(\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\)\)*");
     QRegExpValidator v2(rx2);
     int pos = 0;
-    QString text = nfilterBar->get_filter_editor_text();
+    QString text = nfilterBar->text();
     // If a valid text which can pass the regexp validator is inputted, set the switcher TRUE and start complex filter mode
         // else go to global filter
     if(v2.validate(text, pos) == 2)
     {
         nsortfilterproxyModel->set_switcher(TRUE);
         nsortfilterproxyModel->clear();
-        QStringList list = nfilterBar->get_filter_editor_text().split("|");
+        QStringList list = nfilterBar->text().split("|");
         for(QString per_string:list)
         {
             // "head" : column name
@@ -145,7 +161,7 @@ void Window::filter()
 void Window::global_filter()
 {
     nsortfilterproxyModel->set_switcher(FALSE);
-    QRegExp regExp(nfilterBar->get_filter_editor_text(),
+    QRegExp regExp(nfilterBar->text(),
                    nfilterBar->caseSensitivity(),
                    nfilterBar->patternSyntax());
     nsortfilterproxyModel->setFilterRegExp(regExp);

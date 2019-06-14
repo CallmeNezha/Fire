@@ -48,9 +48,8 @@ protected:
     QPushButton find_prev_item;
     QPushButton find_next_item;
     QPushButton close_button;
-
-    QAction      *case_sensitivity_action_;
-    QActionGroup *pattern_group_;
+    QAction       *case_sensitivity_action_;
+    QActionGroup  *pattern_group_;
 
 };
 
