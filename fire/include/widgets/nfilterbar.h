@@ -1,5 +1,5 @@
-#ifndef NFINDBAR_H
-#define NFINDBAR_H
+#ifndef NFILTERBAR_H
+#define NFILTERBAR_H
 
 #include <QWidget>
 #include <QLineEdit>
@@ -9,18 +9,18 @@
 #include <QActionGroup>
 #include <QRegExp>
 
-
-
-class NFindBar : public QWidget
+class NFilterBar : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(Qt::CaseSensitivity caseSensitivity READ caseSensitivity WRITE setCaseSensitivity)
     Q_PROPERTY(QRegExp::PatternSyntax patternSyntax READ patternSyntax WRITE setPatternSyntax)
 
 signals:
-    void prevBtnClicked();
-    void nextBtnClicked();
+    void filterBtnClicked();
     void filterChanged();
+
+    /// RETURN KEY PRESSED WHEN FOCUS ON THIS WIDGET
+    void returnPressed();
 
 public slots:
     void show_hide();
@@ -33,24 +33,26 @@ public:
         UseRegularExp = 4
     };
 
-    explicit NFindBar(QWidget *parent = nullptr);
+    explicit NFilterBar(QWidget *parent = nullptr);
 
 
     Qt::CaseSensitivity caseSensitivity() const;
     void setCaseSensitivity(Qt::CaseSensitivity cs);
 
-
     QRegExp::PatternSyntax patternSyntax() const;
     void setPatternSyntax(QRegExp::PatternSyntax s);
-protected:
 
-    QLineEdit   find_editor;
-    QPushButton find_prev_item;
-    QPushButton find_next_item;
+    QString text() const { return filter_editor.text();}
+    void setText(QString text);
+
+private:
+
+    QLineEdit   filter_editor;
+    QPushButton filter_button;
     QPushButton close_button;
-    QAction       *case_sensitivity_action_;
-    QActionGroup  *pattern_group_;
+
+    QAction      *case_sensitivity_action_;
+    QActionGroup *pattern_group_;
 
 };
-
-#endif // NFINDBAR_H
+#endif // NFILTERBAR_H
