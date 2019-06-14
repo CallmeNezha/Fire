@@ -7,8 +7,7 @@
 #include <QVector>
 #include <QMainWindow>
 
-// the parameter is used to set header_list
-QStandardItemModel* parseCSV(QStringList &header_list)
+QStandardItemModel* parseCSV()
 {
     QStandardItemModel* csvModel = new QStandardItemModel();
     QFile file("D:/Huang/msg_name_table.csv");
@@ -20,7 +19,6 @@ QStandardItemModel* parseCSV(QStringList &header_list)
         QString line = file.readLine();
         QStringList list = line.simplified().split(',');
         csvModel->setHorizontalHeaderLabels(list);
-        header_list = list;
         QTextStream in(&file);
         //Reads the data up to the end of file
         while (!in.atEnd())
@@ -48,11 +46,12 @@ Window::Window()
 
     /* Load source model, load proxy model with source model.Then set the proxy model as source model in tableview */
     sourceModel = new QStandardItemModel();
-    sourceModel = parseCSV(header_list);
+    sourceModel = parseCSV();
     nsortfilterproxyModel = new NSortFilterProxyModel();
     nsortfilterproxyModel->setSourceModel(sourceModel);
     ntableView = new NTableView(nsortfilterproxyModel);
 
+    init_header_list(nsortfilterproxyModel);
     /* Add widgets and set specific attributes */
     qvboxLayout = new QVBoxLayout();
     qmainWindow->centralWidget()->setLayout(qvboxLayout);
@@ -109,15 +108,14 @@ void Window::appendColumnNameToFilter()
     nfilterBar->setText(current_text);
 }
 
-// Filter function can filter specific rows the user want with fixed string or regexps
+/* Filter function can filter specific rows the user want with fixed string or regexps */
 void Window::filter()
 {
     QRegExp rx2("\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\(\\|\(\\s*\"[^,\"]*\"\\s*=\\s*\\{\\s*\(\"[^,\"]*\"\)\\s*\(,\\s*\"[^,\"]*\"\\s*\)*\\s*\\}\\s*\)\)*");
     QRegExpValidator v2(rx2);
     int pos = 0;
     QString text = nfilterBar->text();
-    // If a valid text which can pass the regexp validator is inputted, set the switcher TRUE and start complex filter mode
-        // else go to global filter
+    // If a valid text which can pass the regexp validator is inputted, set the switcher TRUE and start complex filter mode, else go to global filter.
     if(v2.validate(text, pos) == 2)
     {
         nsortfilterproxyModel->set_switcher(TRUE);
@@ -157,7 +155,7 @@ void Window::filter()
     }
 }
 
-// Filter key words globally
+/* Filter key words globally */
 void Window::global_filter()
 {
     nsortfilterproxyModel->set_switcher(FALSE);
@@ -177,6 +175,14 @@ void Window::next()
 {
     // to be completed
     return;
+}
+
+void Window::init_header_list(NSortFilterProxyModel *model)
+{
+    for(int i = 0; i < model->columnCount(); i++)
+    {
+      header_list.append(model->headerData(i, Qt::Horizontal).toString());
+    }
 }
 
 

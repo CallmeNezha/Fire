@@ -53,6 +53,7 @@ private:
     QVBoxLayout *qvboxLayout;
     QStandardItemModel *sourceModel;
     QStringList header_list;
+    void init_header_list(NSortFilterProxyModel *model);
     void global_filter();
 };
 //! [0]
